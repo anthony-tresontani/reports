@@ -3,17 +3,22 @@ import StringIO
 from htsql import HTSQL
 from celery.task import task
 
+from report_handler import ReportHandler
+
 class Report(object):
 
     NO_RUN, RUNNING, DONE, FAILED = 0, 1, 2, -1
 
-    def __init__(self):
+    def __init__(self, report_handler=ReportHandler()):
         self._data = []
         self.output = StringIO.StringIO()
         self.writer = csv.writer(self.output, delimiter=getattr(self, "delimiter", ","))
         self.content = None
         self.asynchronous = getattr(self, "asynch", False)
         self.run = False
+        self.report_handler = report_handler
+        self.report_handler.add_report(self)
+        self._status = None
 
     def populate(self):
         raise NotImplementedError()
@@ -34,10 +39,12 @@ class Report(object):
 
     def produce(self):
         self.run = True
+        self.report_handler.pre_run(report=self)
         if self.asynchronous:
             self._status = async_populate.delay(self) 
         else:
             self.populate()
+        self.report_handler.post_run(report=self)
         return self.status()
 
     def write_line(self, line):
@@ -61,8 +68,8 @@ def async_populate(instance):
         
 
 class HTSQLReport(Report):
-    def __init__(self):
-        super(HTSQLReport, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(HTSQLReport, self).__init__(*args, **kwargs)
         self._session = HTSQL(self.connexion)
 
     def populate(self):

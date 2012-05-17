@@ -1,16 +1,44 @@
 import csv
 import StringIO
 from htsql import HTSQL
+from celery.task import task
 
 class Report(object):
+
+    NO_RUN, RUNNING, DONE, FAILED = 0, 1, 2, -1
+
     def __init__(self):
         self._data = []
         self.output = StringIO.StringIO()
         self.writer = csv.writer(self.output, delimiter=getattr(self, "delimiter", ","))
         self.content = None
+        self.asynchronous = getattr(self, "asynch", False)
+        self.run = False
+
+    def populate(self):
+        raise NotImplementedError()
+
+    def status(self):
+        if not self.run:
+            return self.NO_RUN
+        if self.asynchronous:
+            if self._status.ready():
+                if self._status.successful():
+                    return self.DONE
+                else:
+                    return self.FAILED
+            else:
+                return self.RUNNING
+        else:
+            return self.DONE
 
     def produce(self):
-        raise NotImplementedError()
+        self.run = True
+        if self.asynchronous:
+            self._status = async_populate.delay(self) 
+        else:
+            self.populate()
+        return self.status()
 
     def write_line(self, line):
         self.writer.writerow([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in line])
@@ -27,6 +55,9 @@ class Report(object):
             file_.write(self.content)
             return file_
         
+@task
+def async_populate(instance):
+     return instance.populate()
         
 
 class HTSQLReport(Report):
@@ -34,5 +65,5 @@ class HTSQLReport(Report):
         super(HTSQLReport, self).__init__()
         self._session = HTSQL(self.connexion)
 
-    def produce(self):
+    def populate(self):
         self._data = self._session.produce(self.query)

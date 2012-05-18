@@ -1,18 +1,29 @@
-import csv
 import StringIO
 from htsql import HTSQL
 from celery.task import task
 
 from report_handler import ReportHandler
+from formatter import CSVFormatter
+
+class ReportMetaClass(type):
+    def __new__(meta, classname, bases, classDict):
+        cls = type.__new__(meta, classname, bases, classDict)
+        if not classname in ["Report", "HTSQLReport"]:
+            if not "name" in classDict:
+                raise AttributeError("%s class should have a name" % classname)
+        return cls
+
 
 class Report(object):
 
+    __metaclass__ = ReportMetaClass
+
     NO_RUN, RUNNING, DONE, FAILED = 0, 1, 2, -1
 
-    def __init__(self, report_handler=ReportHandler()):
+    def __init__(self, report_handler=ReportHandler(), formatter=CSVFormatter):
         self._data = []
         self.output = StringIO.StringIO()
-        self.writer = csv.writer(self.output, delimiter=getattr(self, "delimiter", ","))
+        self.formatter = formatter(self)
         self.content = None
         self.asynchronous = getattr(self, "asynch", False)
         self.run = False
@@ -48,7 +59,7 @@ class Report(object):
         return self.status()
 
     def write_line(self, line):
-        self.writer.writerow([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in line])
+        self.formatter.write([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in line])
 
     def get_data(self):
         for line in self._data:

@@ -1,17 +1,19 @@
 from unittest import TestCase
 from hamcrest import *
 from report import HTSQLReport, Report
-from report_handler import MemoryReportHandler
+from report_handler import MemoryReportHandler, DjangoReportHandler
+from report_tracking.models import ReportTracking
 
-class TestReport(TestCase):
-    class MyReport(HTSQLReport):
+class MyReport(HTSQLReport):
         encoding = "latin-1"
         query = "/school"
         delimiter = ";"
         connexion = "sqlite:htsql_demo.sqlite"
+        name = "myReport"
 
+class TestReport(TestCase):
     def test_synch_report(self):
-        report = TestReport.MyReport()
+        report = MyReport()
         result = report.produce()
         content = report.get_data()
         file_report = report.as_file("/tmp/report.csv")
@@ -20,7 +22,7 @@ class TestReport(TestCase):
         assert_that(isinstance(file_report, file))
 
     def test_asynch_report(self):
-        report = TestReport.MyReport()
+        report = MyReport()
         report.asynchronous = True
         result = report.produce()
         content = report.get_data()
@@ -29,7 +31,7 @@ class TestReport(TestCase):
 
     def test_report_status(self):
         report_handler = MemoryReportHandler()
-        report = TestReport.MyReport(report_handler=report_handler)
+        report = MyReport(report_handler=report_handler)
 
         assert_that(len(report_handler.get_all_reports()), is_(1))
         assert_that(report_handler.get_all_reports()[0][0], none())
@@ -38,3 +40,13 @@ class TestReport(TestCase):
         assert_that(report_handler.get_all_reports()[0][0], not_none())
         assert_that(report_handler.get_all_reports()[0][2], is_(Report.DONE))
 
+class DjangoReportHandlerTest(TestCase):
+
+    def test_report_add_entries(self):
+        report_handler = DjangoReportHandler()
+        report = MyReport(report_handler=report_handler)
+        report2 = MyReport(report_handler=report_handler)
+
+        report.produce()
+        assert_that(ReportTracking.objects.count(), is_(1))
+        assert_that(ReportTracking.objects.all()[0].status, is_(Report.DONE))

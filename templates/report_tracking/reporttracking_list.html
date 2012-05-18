@@ -1,0 +1,20 @@
+{% load report_lists %}
+
+{% available_reports %}
+<form method="post">
+    {% csrf_token %}
+    <select name="report_action">
+      {% for report_name in available_report %}
+      <option value="{{ report_name }}">{{ report_name }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit"/>
+</form>
+
+
+<table>
+{% for report in object_list %}
+    <tr><td>{{report.report_name}}</td><td>{{report.report_date}}</td><td>{{report.status}}</td></tr>
+{% endfor %}
+</table>
+

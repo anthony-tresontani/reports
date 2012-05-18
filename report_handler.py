@@ -1,4 +1,5 @@
 from datetime import datetime
+from report_tracking.models import ReportTracking
 
 class ReportHandler(object):
     def __init__(self):
@@ -24,3 +25,15 @@ class ReportHandler(object):
 
 class MemoryReportHandler(ReportHandler):    
     pass
+
+class DjangoReportHandler(ReportHandler):
+   def pre_run(self, report):
+        super(DjangoReportHandler, self).pre_run(report)
+        date, report, status = self.reports_exec[report]
+        report_track = ReportTracking.objects.get_or_create(report_name="name",status=0, report_date=date)
+
+   def post_run(self, report):
+       super(DjangoReportHandler, self).post_run(report)
+       report_tracking = ReportTracking.objects.get(report_name="name")
+       report_tracking.status = report.status()
+       report_tracking.save()

@@ -9,3 +9,10 @@ class MyReport(HTSQLReport):
     connexion = "sqlite:htsql_demo.sqlite"
     name= "my name"
 
+class MyReport2(HTSQLReport):
+    encoding = "latin-1"
+    query = "/school"
+    delimiter = ";"
+    connexion = "sqlite:htsql_demo.sqlite"
+    name= "report2"
+

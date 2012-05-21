@@ -30,10 +30,12 @@ class DjangoReportHandler(ReportHandler):
    def pre_run(self, report):
         super(DjangoReportHandler, self).pre_run(report)
         date, report, status = self.reports_exec[report]
-        report_track = ReportTracking.objects.get_or_create(report_name="name",status=0, report_date=date)
+        self.report = report
+        self.report_tracking, created = ReportTracking.objects.get_or_create(report_name=self.report.name,status=self.report.status(), report_date=date)
 
    def post_run(self, report):
        super(DjangoReportHandler, self).post_run(report)
-       report_tracking = ReportTracking.objects.get(report_name="name")
-       report_tracking.status = report.status()
-       report_tracking.save()
+       self.report_tracking.status = report.status()
+       print "FILENAME", self.report.filename
+       self.report_tracking.report_file = self.report.filename
+       self.report_tracking.save()

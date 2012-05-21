@@ -1,4 +1,5 @@
 import StringIO
+import datetime
 from htsql import HTSQL
 from celery.task import task
 
@@ -19,6 +20,11 @@ class Report(object):
     __metaclass__ = ReportMetaClass
 
     NO_RUN, RUNNING, DONE, FAILED = 0, 1, 2, -1
+    status_description = {0: "No run",
+                          1: "Running",
+                          2: "Done",
+                          -1: "Failed",
+                          }
 
     def __init__(self, report_handler=ReportHandler(), formatter=CSVFormatter):
         self._data = []
@@ -33,6 +39,10 @@ class Report(object):
 
     def populate(self):
         raise NotImplementedError()
+
+    def _populate(self):
+       self.populate()
+       self.post_populate()
 
     def status(self):
         if not self.run:
@@ -54,7 +64,7 @@ class Report(object):
         if self.asynchronous:
             self._status = async_populate.delay(self) 
         else:
-            self.populate()
+            self._populate()
         self.report_handler.post_run(report=self)
         return self.status()
 
@@ -67,15 +77,21 @@ class Report(object):
         self.content = self.output.getvalue()
         return self.content
 
+    def post_populate(self):
+        raise NotImplemented()
+
     def as_file(self, filename):
         file_ = open(filename, "wb")
-        if self.content:
-            file_.write(self.content)
-            return file_
+        if not self.content:
+            self.get_data()
+        file_.write(self.content)
+        return file_
         
 @task
 def async_populate(instance):
-     return instance.populate()
+     status = instance._populate()
+     instance.post_populate()
+     return status
         
 
 class HTSQLReport(Report):
@@ -85,3 +101,8 @@ class HTSQLReport(Report):
 
     def populate(self):
         self._data = self._session.produce(self.query)
+
+    def post_populate(self):
+        now_ = datetime.datetime.now().strftime("%Y%M%d_%H%m%s")
+        self.filename = "/tmp/%s_%s_%d" % (self.name, now_,  id(self))
+        self.as_file(self.filename)

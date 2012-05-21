@@ -4,3 +4,4 @@ from reports import *
 
 # Create your models here.
 register(MyReport)
+register(MyReport2)

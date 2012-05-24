@@ -4,13 +4,22 @@
 <form method="post">
     {% csrf_token %}
     <select name="report_action">
-      {% for report_name in available_reports %}
+      {% for report_name, form in available_reports %}
       <option value="{{ report_name }}">{{ report_name }}</option>
       {% endfor %}
     </select>
     <input type="submit"/>
 </form>
-
+{% for report_name, report_form in available_reports %}
+     <form method="post">
+        {% csrf_token %}
+        {{report_name}} <input type="hidden" value="{{report_name}}" name="report_action"/>
+        {% if report_form %}
+          {{report_form}}
+        {% endif %}
+         <input type="submit"/>
+     </form>
+{% endfor %}
 
 <table>
 {% for report in reports_list %}

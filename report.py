@@ -26,7 +26,7 @@ class Report(object):
                           -1: "Failed",
                           }
 
-    def __init__(self, report_handler=ReportHandler(), formatter=CSVFormatter):
+    def __init__(self, parameters=None, report_handler=ReportHandler(), formatter=CSVFormatter):
         self._data = []
         self.output = StringIO.StringIO()
         self.formatter = formatter(self)
@@ -36,6 +36,7 @@ class Report(object):
         self.report_handler = report_handler
         self.report_handler.add_report(self)
         self._status = None
+        self.parameters = parameters or {}
 
     def populate(self):
         raise NotImplementedError()
@@ -86,6 +87,15 @@ class Report(object):
             self.get_data()
         file_.write(self.content)
         return file_
+
+    @classmethod
+    def get_form_class(cls):
+        return None
+
+    @classmethod
+    def get_form(cls):
+        if cls.get_form_class():
+            return cls.get_form_class()()
         
 @task
 def async_populate(instance):
@@ -100,7 +110,8 @@ class HTSQLReport(Report):
         self._session = HTSQL(self.connexion)
 
     def populate(self):
-        self._data = self._session.produce(self.query)
+        import pdb; pdb.set_trace()
+        self._data = self._session.produce(self.query, **self.parameters)
 
     def post_populate(self):
         now_ = datetime.datetime.now().strftime("%Y%M%d_%H%m%s")

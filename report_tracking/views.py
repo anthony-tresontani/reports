@@ -16,8 +16,9 @@ class ReportTrackingView(ListView):
     def post(self, request):
         data = copy.copy(request.POST)
         report_type = data.pop('report_action')[0]
+        del data['csrfmiddlewaretoken']
         report_class = get_report_by_name(report_type)
-        report = report_class(report_handler=DjangoReportHandler())
+        report = report_class(report_handler=DjangoReportHandler(), parameters=data)
         report.produce()
         return self.get(request)
 

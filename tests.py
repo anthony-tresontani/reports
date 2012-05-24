@@ -10,6 +10,7 @@ class MyReportTest(HTSQLReport):
         delimiter = ";"
         connexion = "sqlite:htsql_demo.sqlite"
         name = "myReport"
+        arguments = ['name']
 
 class TestReport(TestCase):
     def test_synch_report(self):

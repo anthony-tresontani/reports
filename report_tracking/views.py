@@ -1,6 +1,8 @@
 import copy
+import shutil
 
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
+from django.http import HttpResponse
 from report_tracking.models import ReportTracking
 from report_handler import DjangoReportHandler
 from . import get_report_by_name
@@ -18,3 +20,14 @@ class ReportTrackingView(ListView):
         report = report_class(report_handler=DjangoReportHandler())
         report.produce()
         return self.get(request)
+
+class ReportTrackingDetailView(DetailView):
+    queryset = ReportTracking.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        super(ReportTrackingDetailView, self).get(request, *args, **kwargs)
+        response = HttpResponse(mimetype="text/csv")
+        response['Content-Disposition'] = 'attachment; filename=%s' % self.object.report_file
+        file_ = open(self.object.report_file) 
+        shutil.copyfileobj(file_, response)
+        return response

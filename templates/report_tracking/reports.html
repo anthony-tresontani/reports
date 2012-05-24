@@ -19,7 +19,7 @@
         <td>{{report.report_date}}</td>
         <td>{{report.display_status}}</td>
         <td>{% if report.is_ready %}
-                {{report.report_file}}
+                <a href="{% url report-download pk=report.id %}">Download</>
             {% endif %}
         </td>
     </tr>

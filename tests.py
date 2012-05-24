@@ -4,7 +4,7 @@ from report import HTSQLReport, Report
 from report_handler import MemoryReportHandler, DjangoReportHandler
 from report_tracking.models import ReportTracking
 
-class MyReport(HTSQLReport):
+class MyReportTest(HTSQLReport):
         encoding = "latin-1"
         query = "/school"
         delimiter = ";"

@@ -28,7 +28,9 @@ class ReportTrackingDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         super(ReportTrackingDetailView, self).get(request, *args, **kwargs)
         response = HttpResponse(mimetype="text/csv")
-        response['Content-Disposition'] = 'attachment; filename=%s' % self.object.report_file
+        new_file = self.object.report_name + ' ' \
+                   + str(self.object.report_date) + '.csv'
+        response['Content-Disposition'] = 'attachment; filename=%s' % new_file
         file_ = open(self.object.report_file) 
         shutil.copyfileobj(file_, response)
         return response

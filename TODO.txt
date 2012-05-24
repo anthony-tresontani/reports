@@ -1,0 +1,3 @@
+Handle form errors
+Display the form when the report is selected only
+Handle other formatter than CSV

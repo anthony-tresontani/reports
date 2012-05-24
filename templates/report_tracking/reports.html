@@ -21,6 +21,15 @@
      </form>
 {% endfor %}
 
+{% if invalid_form %}
+     <form method="post">
+    {% csrf_token %}
+    {{report_name}} <input type="hidden" value="{{invalid_report_name}}" name="report_action"/>
+    {{ invalid_form }}
+    <input type="submit"/>
+     </form>
+{% endif %}
+
 <table>
 {% for report in reports_list %}
     <tr>

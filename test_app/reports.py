@@ -1,7 +1,7 @@
 from report import HTSQLReport, Report
 from report_handler import MemoryReportHandler, DjangoReportHandler
 from report_tracking.models import ReportTracking
-from forms import InputForm
+from forms import *
 
 class SchoolReport(HTSQLReport):
     encoding = "latin-1"
@@ -22,3 +22,7 @@ class MyReport2(HTSQLReport):
     connexion = "sqlite:htsql_demo.sqlite"
     name= "report2"
 
+    @classmethod
+    def get_form_class(self):
+        return IntegerInputForm
+ 

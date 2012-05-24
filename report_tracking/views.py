@@ -18,9 +18,22 @@ class ReportTrackingView(ListView):
         report_type = data.pop('report_action')[0]
         del data['csrfmiddlewaretoken']
         report_class = get_report_by_name(report_type)
-        report = report_class(report_handler=DjangoReportHandler(), parameters=data)
-        report.produce()
+        form_class = report_class.get_form_class()
+        form = form_class(data)
+        if not form.is_valid():
+            self.invalid_form = form
+            self.invalid_report_name = report_type
+        else:
+            report = report_class(report_handler=DjangoReportHandler(), parameters=data)
+            report.produce()
         return self.get(request)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ReportTrackingView, self).get_context_data(*args, **kwargs)
+        if hasattr(self, "invalid_form"):
+            context['invalid_form'] = self.invalid_form
+            context['invalid_report_name'] = self.invalid_report_name
+        return context
 
 class ReportTrackingDetailView(DetailView):
     queryset = ReportTracking.objects.all()

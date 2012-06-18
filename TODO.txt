@@ -1,3 +1,3 @@
-Display the form when the report is selected only
-Handle other formatter than CSV
-Display an asynchronous message when the report is ready (https://github.com/codeinthehole/django-async-messages)
+- Display the form already on load ie trigger the select action
+- Handle other formatter than CSV
+- The HTSQL or Django report construction to an engine/backend design

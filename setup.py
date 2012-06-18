@@ -13,6 +13,7 @@ setup(name='django-async-reports',
       keywords = "CSV Django reporting",
       author='Anthony TRESONTANI',
       author_email='dev.tresontani@gmail.com',
+      include_package_data=True,
       packages=find_packages(exclude=["async_reports.test_app"]),
       install_requires=[
           'Django==1.3.1',

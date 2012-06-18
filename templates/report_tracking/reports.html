@@ -21,67 +21,72 @@ MESSAGES:{% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
 {% endfor %}
 
-
+{% block select_report %}
     <p>Select your report </p>
     <select id="select_report">
       {% for report_name, report_verbose_name, form in available_reports %}
       <option value="{{ report_name }}">{{ report_verbose_name }}</option>
       {% endfor %}
     </select>
+{% endblock %}
 
 
-{% for report_name, verbose_name, report_form in available_reports %}
-    {% if report_form %}
-    <div class="reports" id="{{report_name}}_report">
-     Report: {{ verbose_name}}
-     <form method="post">
-        {% csrf_token %}
-        <input type="hidden" value="{{report_name}}" name="report_action"/>
-        {% if report_form %}
-          {{report_form}}
-        {% endif %}
-         <input type="submit"/>
-     </form>
-     </div>
+{% block report_form %}
+    {% for report_name, verbose_name, report_form in available_reports %}
+	{% if report_form %}
+	<div class="reports" id="{{report_name}}_report">
+	 Report: {{ verbose_name}}
+	 <form method="post">
+	    {% csrf_token %}
+	    <input type="hidden" value="{{report_name}}" name="report_action"/>
+	    {% if report_form %}
+	      {{report_form}}
+	    {% endif %}
+	     <input type="submit"/>
+	 </form>
+	 </div>
     {% endif%}
 {% endfor %}
 
 {% if invalid_form %}
      <form method="post">
-    {% csrf_token %}
-    {{report_name}} <input type="hidden" value="{{invalid_report_name}}" name="report_action"/>
-    {{ invalid_form }}
-    <input type="submit"/>
+	{% csrf_token %}
+	{{report_name}} <input type="hidden" value="{{invalid_report_name}}" name="report_action"/>
+	{{ invalid_form }}
+	<input type="submit"/>
      </form>
 {% endif %}
+{% endblock %}
 
-<table>
-{% for report in reports_list %}
-    <tr>
-        <td>{{report.report_name}}</td>
-        <td>{{report.report_date}}</td>
-        <td>{{report.parameters}}</td>
-        <td>{{report.display_status}}</td>
-        <td>{% if report.is_file_ready %}
-                <a href="{% url report-download pk=report.id %}">Download</>
-            {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-</table>
-<div>
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
+<br/>
+{% block display_reports %}
+    <table>
+    {% for report in reports_list %}
+	<tr>
+	    <td>{{report.report_name}}</td>
+	    <td>{{report.report_date}}</td>
+	    <td>{{report.parameters}}</td>
+	    <td>{{report.display_status}}</td>
+	    <td>{% if report.is_file_ready %}
+		    <a href="{% url report-download pk=report.id %}">Download</>
+		{% endif %}
+	    </td>
+	</tr>
+    {% endfor %}
+    </table>
+    <div>
+	<span class="step-links">
+	    {% if page_obj.has_previous %}
+		<a href="?page={{ page_obj.previous_page_number }}">previous</a>
+	    {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
+	    <span class="current">
+		Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+	    </span>
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
-
+	    {% if page_obj.has_next %}
+		<a href="?page={{ page_obj.next_page_number }}">next</a>
+	    {% endif %}
+	</span>
+    </div>
+{% endblock %}

@@ -39,14 +39,12 @@ class DjangoReportHandler(ReportHandler):
    def post_run(self, report, **kwargs):
        super(DjangoReportHandler, self).post_run(report)
 
-       import pdb; pdb.set_trace()
        user = kwargs.get("user", None)
        self.report_tracking.status = report.status()
        self.report_tracking.report_file = self.report.filename
        self.report_tracking.user = user
        self.report_tracking.save()
 
-       #if user.is_authenticated():
        if self.report_tracking.user:
-           print "HIHIHI" * 12
-           message_user(self.report_tracking.user, "Your report is ready")
+           url = self.report_tracking.get_absolute_url()
+           message_user(self.report_tracking.user, "Your report %s is ready <a href='%s'>here</a>" % (self.report.name, url)

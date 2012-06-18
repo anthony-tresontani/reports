@@ -33,4 +33,4 @@ class ReportTracking(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        pass
+        return ('report-download', (), {'pk':self.pk})

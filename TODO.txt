@@ -1,3 +1,4 @@
 - Display the form already on load ie trigger the select action
 - Handle other formatter than CSV
 - The HTSQL or Django report construction to an engine/backend design
+- write a setup.py

@@ -31,6 +31,7 @@ MESSAGES:{% for message in messages %}
 
 
 {% for report_name, verbose_name, report_form in available_reports %}
+    {% if report_form %}
     <div class="reports" id="{{report_name}}_report">
      Report: {{ verbose_name}}
      <form method="post">
@@ -42,6 +43,7 @@ MESSAGES:{% for message in messages %}
          <input type="submit"/>
      </form>
      </div>
+    {% endif%}
 {% endfor %}
 
 {% if invalid_form %}
@@ -58,6 +60,7 @@ MESSAGES:{% for message in messages %}
     <tr>
         <td>{{report.report_name}}</td>
         <td>{{report.report_date}}</td>
+        <td>{{report.parameters}}</td>
         <td>{{report.display_status}}</td>
         <td>{% if report.is_file_ready %}
                 <a href="{% url report-download pk=report.id %}">Download</>

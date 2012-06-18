@@ -42,9 +42,10 @@ class DjangoReportHandler(ReportHandler):
        user = kwargs.get("user", None)
        self.report_tracking.status = report.status()
        self.report_tracking.report_file = self.report.filename
+       self.report_tracking.data = self.report.parameters
        self.report_tracking.user = user
        self.report_tracking.save()
 
        if self.report_tracking.user:
            url = self.report_tracking.get_absolute_url()
-           message_user(self.report_tracking.user, "Your report %s is ready <a href='%s'>here</a>" % (self.report.name, url)
+           message_user(self.report_tracking.user, "Your report %s is ready <a href='%s'>here</a>" % (self.report.name, url))

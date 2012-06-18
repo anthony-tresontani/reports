@@ -2,6 +2,7 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 from . import report_lists
+from jsonfield import JSONField
 
 # Create your models here.
 class ReportTracking(models.Model):
@@ -11,6 +12,7 @@ class ReportTracking(models.Model):
     report_date = models.DateTimeField()
     report_file = models.FilePathField(null=True)
     user = models.ForeignKey(User, blank=True, null=True)
+    data = JSONField(null=True)
 
     class Meta:
         ordering = ["-report_date"]
@@ -28,8 +30,16 @@ class ReportTracking(models.Model):
        from report import Report
        return self.status == Report.DONE and os.path.exists(self.report_file)
 
+    @property
     def download(self):
        return "download"
+
+    @property
+    def parameters(self):
+        params = []
+        for key in self.data:
+            params.append( "%s:%s" % (key, self.data[key]))
+        return "|".join(params)
 
     @models.permalink
     def get_absolute_url(self):

@@ -4,7 +4,7 @@ import shutil
 from django.views.generic import ListView, DetailView
 from django.http import HttpResponse
 from report_tracking.models import ReportTracking
-from report_handler import DjangoReportHandler
+from .report_handler import DjangoReportHandler
 from . import get_report_by_name
 
 # Create your views here.

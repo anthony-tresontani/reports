@@ -42,7 +42,6 @@ class Report(object):
 
     @classmethod
     def get_verbose_name(self):
-        print "GETVERBOSE"
         return getattr(self, "verbose_name", self.name)
 
     def populate(self):
@@ -101,7 +100,6 @@ class Report(object):
 
     @classmethod
     def get_form(cls):
-        print "Get form for %s" % cls
         if cls.get_form_class():
             return cls.get_form_class()()
         
@@ -115,7 +113,7 @@ def async_populate(instance):
 class HTSQLReport(Report):
     def __init__(self, *args, **kwargs):
         super(HTSQLReport, self).__init__(*args, **kwargs)
-        self._connexion = getattr(self, "connexion", None) or settings.HTSQL_CONNEXION
+        self._connexion = getattr(self, "connexion", None) or getattr(settings,"HTSQL_REPORT_CONNEXION")
         self._session = HTSQL(self._connexion)
 
     def populate(self):

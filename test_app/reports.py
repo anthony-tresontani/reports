@@ -7,7 +7,6 @@ class SchoolReport(HTSQLReport):
     encoding = "latin-1"
     query = "/department{name}?school.code=$sc"
     delimiter = ";"
-    connexion = "sqlite:htsql_demo.sqlite"
     verbose_name = "school report"
     name = "school_report"
 
@@ -26,6 +25,5 @@ class MyReport2(HTSQLReport):
 
     @classmethod
     def get_form_class(self):
-        print "HEHE" * 12
         return IntegerInputForm
  

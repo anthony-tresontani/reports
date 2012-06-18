@@ -162,3 +162,6 @@ CACHES = {
         'LOCATION': 'unique-snowflake'
     }
 }
+
+HTSQL_REPORT_CONNEXION = "sqlite:htsql_demo.sqlite"
+

@@ -1,24 +1,47 @@
 {% load report_lists %}
 
 {% available_reports %}
-<form method="post">
-    {% csrf_token %}
-    <select name="report_action">
-      {% for report_name, form in available_reports %}
-      <option value="{{ report_name }}">{{ report_name }}</option>
+
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+
+<script language="javascript" type="text/javascript">
+    $(function(){
+        $(".reports").hide();
+        $("#select_report").change(function(){
+            var id_report = "#" + $("#select_report option:selected").val() + "_report"
+            $(".reports").hide();
+            $(id_report).show();
+        });
+    });  
+</script>
+
+MESSAGES:{% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>M:{{ message }}</li>
+{% endfor %}
+
+
+    <p>Select your report </p>
+    <select id="select_report">
+      {% for report_name, report_verbose_name, form in available_reports %}
+      <option value="{{ report_name }}">{{ report_verbose_name }}</option>
       {% endfor %}
     </select>
-    <input type="submit"/>
-</form>
-{% for report_name, report_form in available_reports %}
+
+
+{% for report_name, verbose_name, report_form in available_reports %}
+    <div class="reports" id="{{report_name}}_report">
+     Report: {{ verbose_name}}
      <form method="post">
         {% csrf_token %}
-        {{report_name}} <input type="hidden" value="{{report_name}}" name="report_action"/>
+        <input type="hidden" value="{{report_name}}" name="report_action"/>
         {% if report_form %}
           {{report_form}}
         {% endif %}
          <input type="submit"/>
      </form>
+     </div>
 {% endfor %}
 
 {% if invalid_form %}
@@ -36,11 +59,26 @@
         <td>{{report.report_name}}</td>
         <td>{{report.report_date}}</td>
         <td>{{report.display_status}}</td>
-        <td>{% if report.is_ready %}
+        <td>{% if report.is_file_ready %}
                 <a href="{% url report-download pk=report.id %}">Download</>
             {% endif %}
         </td>
     </tr>
 {% endfor %}
 </table>
+<div>
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 

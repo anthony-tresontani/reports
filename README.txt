@@ -17,4 +17,4 @@ class MyReport(HTSQLReport):
   CSV delimiter
 
 `connexion`
-  HTSQL connexion
+  HTSQL connexion. Can be defined sitewise with parameter HTSQL_CONNEXION

@@ -4,7 +4,7 @@ class InputForm(forms.Form):
     """ 
     Fund file form for the admin importer
     """
-    school_code = forms.CharField()
+    sc = forms.CharField()
 
 class IntegerInputForm(forms.Form):
     """ 

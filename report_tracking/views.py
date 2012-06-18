@@ -12,6 +12,10 @@ class ReportTrackingView(ListView):
     model = ReportTracking
     template_name = "report_tracking/reports.html"
     context_object_name = "reports_list"
+    paginate_by = 10
+
+    def get(self, request, *args, **kwargs):
+       return  super(ReportTrackingView, self).get(request, *args, **kwargs)
 
     def post(self, request):
         data = copy.copy(request.POST)
@@ -25,7 +29,8 @@ class ReportTrackingView(ListView):
             self.invalid_report_name = report_type
         else:
             report = report_class(report_handler=DjangoReportHandler(), parameters=data)
-            report.produce()
+            user = self.request.user if self.request.user.is_authenticated() else None
+            report.produce(user=user)
         return self.get(request)
 
     def get_context_data(self, *args, **kwargs):

@@ -6,6 +6,8 @@ from celery.task import task
 from report_handler import ReportHandler
 from formatter import CSVFormatter
 
+from django.conf import settings
+
 class ReportMetaClass(type):
     def __new__(meta, classname, bases, classDict):
         cls = type.__new__(meta, classname, bases, classDict)
@@ -38,6 +40,11 @@ class Report(object):
         self._status = None
         self.parameters = parameters or {}
 
+    @classmethod
+    def get_verbose_name(self):
+        print "GETVERBOSE"
+        return getattr(self, "verbose_name", self.name)
+
     def populate(self):
         raise NotImplementedError()
 
@@ -59,14 +66,14 @@ class Report(object):
         else:
             return self.DONE
 
-    def produce(self):
+    def produce(self, **kwargs):
         self.run = True
-        self.report_handler.pre_run(report=self)
+        self.report_handler.pre_run(report=self, **kwargs)
         if self.asynchronous:
             self._status = async_populate.delay(self) 
         else:
             self._populate()
-        self.report_handler.post_run(report=self)
+        self.report_handler.post_run(report=self, **kwargs)
         return self.status()
 
     def write_line(self, line):
@@ -94,6 +101,7 @@ class Report(object):
 
     @classmethod
     def get_form(cls):
+        print "Get form for %s" % cls
         if cls.get_form_class():
             return cls.get_form_class()()
         
@@ -107,10 +115,10 @@ def async_populate(instance):
 class HTSQLReport(Report):
     def __init__(self, *args, **kwargs):
         super(HTSQLReport, self).__init__(*args, **kwargs)
-        self._session = HTSQL(self.connexion)
+        self._connexion = getattr(self, "connexion", None) or settings.HTSQL_CONNEXION
+        self._session = HTSQL(self._connexion)
 
     def populate(self):
-        import pdb; pdb.set_trace()
         self._data = self._session.produce(self.query, **self.parameters)
 
     def post_populate(self):

@@ -5,10 +5,11 @@ from forms import *
 
 class SchoolReport(HTSQLReport):
     encoding = "latin-1"
-    query = "/department{name}?school.code=$school_code"
+    query = "/department{name}?school.code=$sc"
     delimiter = ";"
     connexion = "sqlite:htsql_demo.sqlite"
-    name = "school report"
+    verbose_name = "school report"
+    name = "school_report"
 
     @classmethod
     def get_form_class(self):
@@ -20,9 +21,11 @@ class MyReport2(HTSQLReport):
     query = "/school"
     delimiter = ";"
     connexion = "sqlite:htsql_demo.sqlite"
-    name= "report2"
+    name= "async_report"
+    async=True
 
     @classmethod
     def get_form_class(self):
+        print "HEHE" * 12
         return IntegerInputForm
  

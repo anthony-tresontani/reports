@@ -1,4 +1,6 @@
+import os
 from django.db import models
+from django.contrib.auth.models import User
 from . import report_lists
 
 # Create your models here.
@@ -8,6 +10,7 @@ class ReportTracking(models.Model):
     status = models.IntegerField(default=0)
     report_date = models.DateTimeField()
     report_file = models.FilePathField(null=True)
+    user = models.ForeignKey(User, blank=True, null=True)
 
     class Meta:
         ordering = ["-report_date"]
@@ -21,9 +24,9 @@ class ReportTracking(models.Model):
         from report import Report
         return Report.status_description.get(self.status, "Invalid status") 
 
-    def is_ready(self):
+    def is_file_ready(self):
        from report import Report
-       return self.status == Report.DONE
+       return self.status == Report.DONE and os.path.exists(self.report_file)
 
     def download(self):
        return "download"

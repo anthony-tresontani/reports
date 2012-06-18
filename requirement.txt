@@ -13,3 +13,4 @@ kombu==2.1.8
 nose==1.1.2
 python-dateutil==1.5
 wsgiref==0.1.2
+pip install django-async-messages

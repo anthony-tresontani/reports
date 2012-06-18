@@ -1,3 +1,5 @@
+Let you build asynchronous report using any kind of engines like Django ORM or HTSQL.
+
 Report creation
 ---------------
 

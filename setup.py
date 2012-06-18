@@ -15,7 +15,7 @@ setup(name='django-async-reports',
       author_email='dev.tresontani@gmail.com',
       packages=find_packages(exclude=["async_reports.test_app"]),
       install_requires=[
-          'django>1.3',
+          'django>=1.3',
           'South==0.7.3',
           'django-jsonfield==0.8.10',
           'celery==2.5.3',

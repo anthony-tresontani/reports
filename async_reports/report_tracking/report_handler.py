@@ -1,5 +1,5 @@
 from async_messages import message_user
-from reports.report_handler import ReportHandler
+from async_reports.report_handler import ReportHandler
 from .models import ReportTracking
 
 class DjangoReportHandler(ReportHandler):

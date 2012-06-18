@@ -7,7 +7,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name='django-async-reports',
-      version='0.1.1',
+      version='0.1.5',
       long_description =read('README.txt'),
       description='Reporting for django',
       keywords = "CSV Django reporting",
@@ -15,7 +15,7 @@ setup(name='django-async-reports',
       author_email='dev.tresontani@gmail.com',
       packages=find_packages(exclude=["async_reports.test_app"]),
       install_requires=[
-          'django>=1.3',
+          'Django==1.3.1',
           'South==0.7.3',
           'django-jsonfield==0.8.10',
           'celery==2.5.3',

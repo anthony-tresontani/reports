@@ -18,4 +18,6 @@ DATABASES = {
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-INSTALLED_APPS = ('report_tracking',)
+INSTALLED_APPS = ('django.contrib.auth',
+                  'django.contrib.contenttypes',
+                   'report_tracking',)

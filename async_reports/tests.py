@@ -1,8 +1,9 @@
 from unittest import TestCase
 from hamcrest import *
-from report import HTSQLReport, Report
-from report_handler import MemoryReportHandler, DjangoReportHandler
-from report_tracking.models import ReportTracking
+from async_reports.report import HTSQLReport, Report
+from async_reports.report_handler import MemoryReportHandler
+from async_reports.report_tracking.report_handler import DjangoReportHandler
+from async_reports.report_tracking.models import ReportTracking
 
 class MyReportTest(HTSQLReport):
         encoding = "latin-1"
@@ -13,26 +14,27 @@ class MyReportTest(HTSQLReport):
         arguments = ['name']
 
 class TestReport(TestCase):
+    def setUp(self):
+        self.report = MyReportTest()
+
     def test_synch_report(self):
-        report = MyReport()
-        result = report.produce()
-        content = report.get_data()
-        file_report = report.as_file("/tmp/report.csv")
-        assert_that(len(content.splitlines()), is_(9))
+        result = self.report.produce()
+        content = self.report.get_data()
+        file_report = self.report.as_file("/tmp/report.csv")
+        assert_that(len(content.splitlines()), is_(18))
         assert_that(";" in content)
         assert_that(isinstance(file_report, file))
 
     def test_asynch_report(self):
-        report = MyReport()
-        report.asynchronous = True
-        result = report.produce()
-        content = report.get_data()
-        assert_that(report.status(), is_not(-1))
-        assert_that(len(content.splitlines()), is_(9))
+        self.report.asynchronous = True
+        result = self.report.produce()
+        content = self.report.get_data()
+        assert_that(self.report.status(), is_not(-1))
+        assert_that(len(content.splitlines()), is_(18))
 
     def test_report_status(self):
         report_handler = MemoryReportHandler()
-        report = MyReport(report_handler=report_handler)
+        report = MyReportTest(report_handler=report_handler)
 
         assert_that(len(report_handler.get_all_reports()), is_(1))
         assert_that(report_handler.get_all_reports()[0][0], none())
@@ -45,8 +47,8 @@ class DjangoReportHandlerTest(TestCase):
 
     def test_report_add_entries(self):
         report_handler = DjangoReportHandler()
-        report = MyReport(report_handler=report_handler)
-        report2 = MyReport(report_handler=report_handler)
+        report = MyReportTest(report_handler=report_handler)
+        report2 = MyReportTest(report_handler=report_handler)
 
         report.produce()
         assert_that(ReportTracking.objects.count(), is_(1))

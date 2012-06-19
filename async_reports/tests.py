@@ -43,6 +43,13 @@ class TestReport(TestCase):
         assert_that(report_handler.get_all_reports()[0][0], not_none())
         assert_that(report_handler.get_all_reports()[0][2], is_(Report.DONE))
 
+    def test_header(self):
+        report = MyReportTest()
+        result = report.produce()
+        content = report.get_data()
+        assert_that(content.splitlines()[0], is_("art;School of Art & Design;old"))
+
+
 class DjangoReportHandlerTest(TestCase):
 
     def test_report_add_entries(self):

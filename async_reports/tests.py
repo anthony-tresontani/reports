@@ -11,7 +11,6 @@ class MyReportTest(HTSQLReport):
         delimiter = ";"
         connexion = "sqlite:htsql_demo.sqlite"
         name = "myReport"
-        arguments = ['name']
 
 class TestReport(TestCase):
     def setUp(self):
@@ -55,14 +54,25 @@ class MyDjangoReportTest(DjangoReport):
     queryset = ReportTracking.objects.all()
     delimiter = ";"
     name = "my django report"
-    arguments = ['name']
 
     def get_row(self, line):
-            return [line.report_name, line.status]
+        return [line.report_name, line.status]
 
 class MyDjangoReportWithHeaderTest(MyDjangoReportTest):
     name = "my django report"
     header = ['report name', 'status']
+
+
+class MyDjangoReportTest(DjangoReport):
+    encoding = "latin-1"
+    delimiter = ";"
+    name = "my django report"
+
+    def get_row(self, line):
+        return [line.report_name, line.status]
+
+    def get_queryset(self, **parameters):
+        return ReportTracking.objects.all()
 
 class DjangoReportTest(TestCase):
     def test_report(self):

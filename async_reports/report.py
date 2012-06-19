@@ -148,7 +148,10 @@ class DjangoReport(Report):
     __abstract__ = True
 
     def populate(self):
-        self._data = self.queryset
+        if hasattr(self, "get_queryset"):
+            self._data = self.get_queryset()
+        else:
+            self._data = self.queryset
 
     def write_header(self, header):
         self.write_data(header)

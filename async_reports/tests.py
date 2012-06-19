@@ -54,6 +54,7 @@ class MyDjangoReportTest(DjangoReport):
     queryset = ReportTracking.objects.all()
     delimiter = ";"
     name = "my django report"
+<<<<<<< HEAD
 
     def get_row(self, line):
         return [line.report_name, line.status]
@@ -73,6 +74,16 @@ class MyDjangoReportTest(DjangoReport):
 
     def get_queryset(self, **parameters):
         return ReportTracking.objects.all()
+=======
+    arguments = ['name']
+
+    def get_row(self, line):
+            return [line.report_name, line.status]
+
+class MyDjangoReportWithHeaderTest(MyDjangoReportTest):
+    name = "my django report"
+    header = ['report name', 'status']
+>>>>>>> ceeb21ce69d2f3d3bef14718f6ca022bb8a35e2c
 
 class DjangoReportTest(TestCase):
     def test_report(self):

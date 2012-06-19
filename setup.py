@@ -7,7 +7,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name='django-async-reports',
-      version='0.1.9',
+      version='0.1.10',
       long_description =read('README.txt'),
       description='Reporting for django',
       keywords = "CSV Django reporting",

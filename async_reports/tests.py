@@ -1,6 +1,6 @@
 from unittest import TestCase
 from hamcrest import *
-from async_reports.report import HTSQLReport, Report
+from async_reports.report import HTSQLReport, Report, DjangoReport
 from async_reports.report_handler import MemoryReportHandler
 from async_reports.report_tracking.report_handler import DjangoReportHandler
 from async_reports.report_tracking.models import ReportTracking
@@ -50,8 +50,39 @@ class TestReport(TestCase):
         assert_that(content.splitlines()[0], is_("art;School of Art & Design;old"))
 
 
-class DjangoReportHandlerTest(TestCase):
+class MyDjangoReportTest(DjangoReport):
+    encoding = "latin-1"
+    queryset = ReportTracking.objects.all()
+    delimiter = ";"
+    name = "my django report"
+    arguments = ['name']
 
+    def get_row(self, line):
+            return [line.report_name, line.status]
+
+class MyDjangoReportWithHeaderTest(MyDjangoReportTest):
+    name = "my django report"
+    header = ['report name', 'status']
+
+class DjangoReportTest(TestCase):
+    def test_report(self):
+        report = MyDjangoReportTest()
+        result = report.produce()
+        content = report.get_data()
+        file_report = report.as_file("/tmp/report.csv")
+        assert_that(len(content.splitlines()), is_(2))
+        assert_that(";" in content)
+        assert_that(isinstance(file_report, file))
+
+    def test_report_with_header(self):
+        report = MyDjangoReportWithHeaderTest()
+        result = report.produce()
+        content = report.get_data()
+        file_report = report.as_file("/tmp/report.csv")
+        assert_that(content.splitlines()[0], is_('report name;status'))
+
+
+class DjangoReportHandlerTest(TestCase):
     def test_report_add_entries(self):
         report_handler = DjangoReportHandler()
         report = MyReportTest(report_handler=report_handler)

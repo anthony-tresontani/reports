@@ -7,6 +7,7 @@ from report_handler import ReportHandler
 from formatter import CSVFormatter
 
 from django.conf import settings
+from django.forms import Form
 
 class ReportMetaClass(type):
     def __new__(meta, classname, bases, classDict):
@@ -96,7 +97,7 @@ class Report(object):
 
     @classmethod
     def get_form_class(cls):
-        return None
+        return Form
 
     @classmethod
     def get_form(cls):

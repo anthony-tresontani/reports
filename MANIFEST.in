@@ -1,1 +1,1 @@
-async_reports/templates/*
+recursive-include async_reports/templates/ *.html

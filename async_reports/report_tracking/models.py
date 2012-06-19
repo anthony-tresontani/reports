@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from . import report_lists
 from jsonfield import JSONField
+from async_reports.report import Report
 
 # Create your models here.
 class ReportTracking(models.Model):
@@ -23,11 +24,9 @@ class ReportTracking(models.Model):
         return [report.name for report in report_lists]
 
     def display_status(self):
-        from report import Report
         return Report.status_description.get(self.status, "Invalid status") 
 
     def is_file_ready(self):
-       from report import Report
        return self.status == Report.DONE and os.path.exists(self.report_file)
 
     @property

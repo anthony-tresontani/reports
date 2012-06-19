@@ -29,7 +29,7 @@ class ReportTrackingView(ListView):
             self.invalid_form = form
             self.invalid_report_name = report_type
         else:
-            report = report_class(report_handler=DjangoReportHandler(), parameters=data)
+            report = report_class(report_handler=DjangoReportHandler(), parameters=form.clean_data)
             user = self.request.user if self.request.user.is_authenticated() else None
             report.produce(user=user)
         return self.get(request)

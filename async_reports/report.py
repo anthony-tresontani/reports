@@ -117,7 +117,10 @@ class Report(object):
         self.write_data(line)
 
     def get_header(self):
-        return []
+        return getattr(self, "header", [])
+
+    def write_header(self, header):
+        self.write_data(header)
 
     @classmethod
     def get_form_class(cls):
@@ -154,9 +157,6 @@ class DjangoReport(Report):
         else:
             self._data = self.queryset
 
-    def write_header(self, header):
-        self.write_data(header)
-
     def write_line(self, line):
         row = self.get_row(line)
         super(DjangoReport, self).write_line(row)
@@ -164,5 +164,3 @@ class DjangoReport(Report):
     def get_row(self, line):
         raise NotImplementedError()
 
-    def get_header(self):
-        return getattr(self, "header", [])

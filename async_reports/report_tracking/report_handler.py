@@ -7,7 +7,7 @@ class DjangoReportHandler(ReportHandler):
         super(DjangoReportHandler, self).pre_run(report)
         date, report, status = self.reports_exec[report]
         self.report = report
-        self.report_tracking, created = ReportTracking.objects.get_or_create(report_name=self.report.name,status=self.report.status(), report_date=date)
+        self.report_tracking, created = ReportTracking.objects.get_or_create(report_name=self.report.verbose_name,status=self.report.status(), report_date=date)
 
    def post_run(self, report, **kwargs):
        super(DjangoReportHandler, self).post_run(report)

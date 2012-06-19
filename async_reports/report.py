@@ -110,7 +110,8 @@ class Report(object):
         return file_
 
     def write_data(self, data):
-        self.formatter.write([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in data])
+        if data:
+            self.formatter.write([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in data])
 
     def write_line(self, line):
         self.write_data(line)

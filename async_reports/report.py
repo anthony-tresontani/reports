@@ -31,16 +31,15 @@ class Report(object):
                           -1: "Failed",
                           }
 
-    def __init__(self, parameters=None, report_handler=ReportHandler(), formatter=CSVFormatter):
+    def __init__(self, parameters=None, report_handler=ReportHandler()):
         self._data = []
         self.output = StringIO.StringIO()
-        self.formatter = formatter(self)
         self.content = None
         self.asynchronous = getattr(self, "asynch", False)
         self.run = False
         self.report_handler = report_handler
         self.report_handler.add_report(self)
-        self._status = None
+        self.status = self.NO_RUN
         self.parameters = parameters or {}
 
     @classmethod
@@ -57,6 +56,7 @@ class Report(object):
     def _populate(self):
        self.populate()
        self.post_populate()
+       self.status = self.DONE
 
     def status(self):
         if not self.run:
@@ -76,11 +76,12 @@ class Report(object):
         self.run = True
         self.report_handler.pre_run(report=self, **kwargs)
         if self.asynchronous:
-            self._status = async_populate.delay(self) 
+            async_populate.delay(self) 
+            self.status = self.RUNNING
         else:
             self._populate()
         self.report_handler.post_run(report=self, **kwargs)
-        return self.status()
+        return self.status
 
     def get_data(self):
         header = self.get_header()
@@ -96,12 +97,6 @@ class Report(object):
         self.filename = "/tmp/%s_%s_%d" % (self.name, now_,  id(self))
         self.as_file(self.filename)
 
-    def write_line(self, line):
-        raise NotImplementedError()
-
-    def write_header(self, header):
-        raise NotImplementedError()
-
     def as_file(self, filename):
         file_ = open(filename, "wb")
         if not self.content:
@@ -114,6 +109,7 @@ class Report(object):
             self.formatter.write([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in data])
 
     def write_line(self, line):
+        self.formatter = CSVFormatter(self)
         self.write_data(line)
 
     def get_header(self):
@@ -133,20 +129,18 @@ class Report(object):
         
 @task
 def async_populate(instance):
-     status = instance._populate()
-     instance.post_populate()
-     return status
-        
+     instance._populate()
 
 class HTSQLReport(Report):
     __abstract__ = True
     def __init__(self, *args, **kwargs):
         super(HTSQLReport, self).__init__(*args, **kwargs)
         self._connexion = getattr(self, "connexion", None) or getattr(settings,"HTSQL_REPORT_CONNEXION")
-        self._session = HTSQL(self._connexion)
 
     def populate(self):
-        self._data = self._session.produce(self.query, **self.parameters)
+        # We can't store the session as there is no way to pickle it
+        session = HTSQL(self._connexion)
+        self._data = session.produce(self.query, **self.parameters)
 
 class DjangoReport(Report):
     __abstract__ = True

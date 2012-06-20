@@ -51,20 +51,6 @@ class TestReport(TestCase):
 
 class MyDjangoReportTest(DjangoReport):
     encoding = "latin-1"
-    queryset = ReportTracking.objects.all()
-    delimiter = ";"
-    name = "my django report"
-
-    def get_row(self, line):
-        return [line.report_name, line.status]
-
-class MyDjangoReportWithHeaderTest(MyDjangoReportTest):
-    name = "my django report"
-    header = ['report name', 'status']
-
-
-class MyDjangoReportTest(DjangoReport):
-    encoding = "latin-1"
     delimiter = ";"
     name = "my django report"
 
@@ -73,6 +59,12 @@ class MyDjangoReportTest(DjangoReport):
 
     def get_queryset(self, **parameters):
         return ReportTracking.objects.all()
+
+
+class MyDjangoReportWithHeaderTest(MyDjangoReportTest):
+    name = "my django report"
+    header = ['report name', 'status']
+
 
 class DjangoReportTest(TestCase):
     def test_report(self):

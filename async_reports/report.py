@@ -53,10 +53,12 @@ class Report(object):
     def populate(self):
         raise NotImplementedError()
 
-    def _populate(self):
+    def _populate(self, **kwargs):
+       self.report_handler.pre_run(report=self, **kwargs)
        self.populate()
        self.post_populate()
        self.status = self.DONE
+       self.report_handler.post_run(report=self, **kwargs)
 
     def _status(self):
         if not self.run:
@@ -74,13 +76,11 @@ class Report(object):
 
     def produce(self, **kwargs):
         self.run = True
-        self.report_handler.pre_run(report=self, **kwargs)
         if self.asynchronous:
-            async_populate.delay(self) 
+            async_populate.delay(self, **kwargs) 
             self.status = self.RUNNING
         else:
-            self._populate()
-        self.report_handler.post_run(report=self, **kwargs)
+            self._populate(**kwargs)
         return self.status
 
     def get_data(self):
@@ -129,8 +129,8 @@ class Report(object):
             return cls.get_form_class()()
         
 @task
-def async_populate(instance):
-     instance._populate()
+def async_populate(instance, **kwargs):
+     instance._populate(**kwargs)
 
 class HTSQLReport(Report):
     __abstract__ = True

@@ -28,7 +28,7 @@ class TestReport(TestCase):
         self.report.asynchronous = True
         result = self.report.produce()
         content = self.report.get_data()
-        assert_that(self.report.status(), is_not(-1))
+        assert_that(self.report.status, is_not(-1))
         assert_that(len(content.splitlines()), is_(18))
 
     def test_report_status(self):

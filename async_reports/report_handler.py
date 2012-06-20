@@ -15,7 +15,7 @@ class ReportHandler(object):
 
     def update_status(self, report):
         date, report, status = self.reports_exec[report]
-        self.reports_exec[report] = (date, report, report.status())
+        self.reports_exec[report] = (date, report, report.status)
 
     def get_all_reports(self):
         for report in self.reports_exec:

@@ -58,7 +58,7 @@ class Report(object):
        self.post_populate()
        self.status = self.DONE
 
-    def status(self):
+    def _status(self):
         if not self.run:
             return self.NO_RUN
         if self.asynchronous:
@@ -105,11 +105,12 @@ class Report(object):
         return file_
 
     def write_data(self, data):
+        if not hasattr(self, "formatter"):
+            self.formatter = CSVFormatter(self)
         if data:
             self.formatter.write([field.encode(getattr(self, "encoding", "utf8")) if hasattr(field, "encode") else field for field in data])
 
     def write_line(self, line):
-        self.formatter = CSVFormatter(self)
         self.write_data(line)
 
     def get_header(self):
